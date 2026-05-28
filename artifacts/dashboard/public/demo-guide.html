@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI-Powered Audit Evidence Review — Client Demo Guide</title>
+<style>
+  :root {
+    --navy: #0B2545;
+    --navy-light: #1a3a6b;
+    --accent: #2563EB;
+    --emerald: #059669;
+    --amber: #D97706;
+    --red: #DC2626;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --slate-900: #0f172a;
+    --font: 'Georgia', 'Times New Roman', serif;
+    --mono: 'Courier New', monospace;
+    --sans: 'Helvetica Neue', Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 11pt; }
+  body { font-family: var(--sans); color: var(--slate-800); background: white; line-height: 1.55; }
+
+  /* Print layout */
+  @media print {
+    html { font-size: 10pt; }
+    .page-break { page-break-before: always; }
+    .no-break { page-break-inside: avoid; }
+    body { background: white; }
+    @page { margin: 1.8cm 2cm; size: A4 portrait; }
+    .cover { page-break-after: always; }
+    header.doc-header { display: none; }
+    .print-note { display: none; }
+  }
+
+  /* Screen helpers */
+  @media screen {
+    body { max-width: 820px; margin: 0 auto; padding: 24px; background: #f0f4f8; }
+    .page { background: white; padding: 48px 56px; margin-bottom: 24px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+    .cover { padding: 64px 56px; }
+    header.doc-header { background: var(--navy); color: white; padding: 12px 24px; font-size: 11px; text-align: center; border-radius: 6px 6px 0 0; margin-bottom: 0; }
+    .print-note { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; font-size: 11px; color: #92400e; }
+  }
+
+  /* ─── Typography ─── */
+  h1 { font-family: var(--sans); font-size: 26pt; font-weight: 800; color: var(--navy); line-height: 1.2; }
+  h2 { font-family: var(--sans); font-size: 15pt; font-weight: 700; color: var(--navy); margin: 0 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--navy); }
+  h3 { font-family: var(--sans); font-size: 12pt; font-weight: 700; color: var(--slate-800); margin: 0 0 8px; }
+  h4 { font-family: var(--sans); font-size: 10pt; font-weight: 700; color: var(--slate-700); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 6px; }
+  p { margin: 0 0 10px; font-size: 10.5pt; color: var(--slate-700); }
+  ul { padding-left: 18px; margin: 0 0 10px; }
+  li { font-size: 10.5pt; color: var(--slate-700); margin-bottom: 5px; }
+  strong { color: var(--slate-800); }
+  .caption { font-size: 9pt; color: var(--slate-400); font-style: italic; }
+
+  /* ─── Cover ─── */
+  .cover-logo { font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: .2em; color: var(--slate-400); margin-bottom: 48px; }
+  .cover-badge { display: inline-block; background: var(--accent); color: white; font-size: 9pt; font-weight: 600; letter-spacing: .05em; padding: 5px 14px; border-radius: 20px; text-transform: uppercase; margin-bottom: 20px; }
+  .cover-rule { width: 56px; height: 4px; background: var(--navy); margin: 20px 0; border-radius: 2px; }
+  .cover-subtitle { font-size: 16pt; color: var(--slate-500); font-weight: 300; margin-bottom: 40px; }
+  .cover-meta { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--slate-200); display: flex; justify-content: space-between; }
+  .cover-meta-item label { font-size: 8pt; text-transform: uppercase; letter-spacing: .1em; color: var(--slate-400); display: block; }
+  .cover-meta-item span { font-size: 10.5pt; font-weight: 600; color: var(--slate-700); }
+
+  /* ─── Table of contents ─── */
+  .toc-entry { display: flex; align-items: baseline; gap: 0; padding: 5px 0; border-bottom: 1px dotted var(--slate-200); }
+  .toc-num { font-size: 9pt; font-weight: 700; color: var(--navy); width: 28px; shrink: 0; }
+  .toc-title { font-size: 10.5pt; color: var(--slate-700); flex: 1; }
+  .toc-section-label { font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--slate-400); margin: 16px 0 6px; }
+
+  /* ─── Sections ─── */
+  section { margin-bottom: 28px; }
+  section:last-child { margin-bottom: 0; }
+
+  /* ─── Callout boxes ─── */
+  .callout { border-radius: 8px; padding: 14px 18px; margin: 14px 0; }
+  .callout.red { background: #fef2f2; border-left: 4px solid var(--red); }
+  .callout.blue { background: #eff6ff; border-left: 4px solid var(--accent); }
+  .callout.green { background: #f0fdf4; border-left: 4px solid var(--emerald); }
+  .callout.amber { background: #fffbeb; border-left: 4px solid var(--amber); }
+  .callout.navy { background: var(--navy); color: white; border-radius: 8px; padding: 20px 24px; }
+  .callout.navy p, .callout.navy li, .callout.navy h3, .callout.navy h4 { color: #e0eaf8; }
+  .callout.navy strong { color: white; }
+  .callout h4 { margin-bottom: 8px; }
+
+  /* ─── Two-column grid ─── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 14px 0; }
+
+  /* ─── Stat cards ─── */
+  .stat-card { background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 8px; padding: 14px 16px; }
+  .stat-card .label { font-size: 8pt; text-transform: uppercase; letter-spacing: .08em; color: var(--slate-400); font-weight: 700; margin-bottom: 4px; }
+  .stat-card .value { font-size: 20pt; font-weight: 800; font-family: var(--mono); color: var(--navy); line-height: 1.1; }
+  .stat-card .sub { font-size: 9pt; color: var(--slate-400); margin-top: 3px; }
+  .stat-card.accent { background: #eff6ff; border-color: #bfdbfe; }
+  .stat-card.accent .value { color: var(--accent); }
+  .stat-card.red { background: #fef2f2; border-color: #fecaca; }
+  .stat-card.red .value { color: var(--red); }
+  .stat-card.green { background: #f0fdf4; border-color: #bbf7d0; }
+  .stat-card.green .value { color: var(--emerald); }
+
+  /* ─── Agent cards ─── */
+  .agent-card { border: 1px solid var(--slate-200); border-radius: 8px; padding: 14px 16px; background: white; }
+  .agent-card .agent-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .agent-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 11pt; flex-shrink: 0; }
+  .agent-card .model { font-size: 8.5pt; font-family: var(--mono); color: var(--slate-400); }
+
+  /* ─── Tab cards ─── */
+  .tab-card { border: 1px solid var(--slate-200); border-radius: 8px; padding: 16px 18px; margin-bottom: 14px; page-break-inside: avoid; }
+  .tab-card .tab-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .tab-num { width: 32px; height: 32px; border-radius: 8px; background: var(--navy); color: white; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 12pt; flex-shrink: 0; }
+  .tab-card h3 { margin: 0; font-size: 12pt; }
+  .tab-card .path { font-size: 8.5pt; font-family: var(--mono); color: var(--slate-400); margin-top: 1px; }
+  .benefit-pill { display: inline-block; background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--emerald); font-size: 8pt; font-weight: 600; padding: 2px 10px; border-radius: 20px; margin: 3px 3px 0 0; }
+
+  /* ─── Step cards (demo walkthrough) ─── */
+  .step-card { border: 1px solid var(--slate-200); border-radius: 8px; padding: 16px 18px; margin-bottom: 14px; page-break-inside: avoid; position: relative; }
+  .step-num { position: absolute; top: -12px; left: 16px; width: 28px; height: 28px; border-radius: 50%; background: var(--navy); color: white; font-weight: 800; font-size: 10pt; display: flex; align-items: center; justify-content: center; }
+  .step-card h3 { margin: 6px 0 8px; font-size: 11.5pt; }
+  .step-card .time-badge { display: inline-block; font-size: 8pt; background: var(--slate-100); color: var(--slate-500); border-radius: 12px; padding: 2px 10px; font-weight: 600; margin-bottom: 8px; }
+  .step-card .say-box { background: #eff6ff; border-left: 3px solid var(--accent); padding: 10px 14px; margin: 10px 0; border-radius: 0 6px 6px 0; font-size: 10pt; font-style: italic; color: var(--slate-700); }
+  .step-card .do-box { background: var(--slate-50); border-left: 3px solid var(--emerald); padding: 10px 14px; margin: 10px 0; border-radius: 0 6px 6px 0; font-size: 10pt; color: var(--slate-700); }
+  .say-label { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); display: block; margin-bottom: 4px; font-style: normal; }
+  .do-label { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--emerald); display: block; margin-bottom: 4px; }
+
+  /* ─── Tables ─── */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 9.5pt; }
+  th { background: var(--navy); color: white; text-align: left; padding: 8px 12px; font-size: 8.5pt; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--slate-100); color: var(--slate-700); vertical-align: top; }
+  tr:nth-child(even) td { background: var(--slate-50); }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; font-size: 8pt; font-weight: 700; padding: 2px 8px; border-radius: 12px; }
+  .badge.green { background: #dcfce7; color: #166534; }
+  .badge.red { background: #fee2e2; color: #991b1b; }
+  .badge.amber { background: #fef3c7; color: #92400e; }
+  .badge.blue { background: #dbeafe; color: #1e40af; }
+
+  /* ─── Footer bar ─── */
+  .footer-bar { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--slate-200); display: flex; justify-content: space-between; font-size: 8.5pt; color: var(--slate-400); }
+
+  /* ─── ROI table highlight ─── */
+  .roi-row td:last-child { font-weight: 700; color: var(--emerald); }
+  .roi-header { font-weight: 800 !important; }
+
+  /* ─── Checklist ─── */
+  .checklist li { list-style: none; padding-left: 0; display: flex; gap: 8px; }
+  .checklist li::before { content: "✓"; color: var(--emerald); font-weight: 700; flex-shrink: 0; }
+
+  /* ─── Tag ─── */
+  .tag { display: inline-block; font-size: 8pt; font-weight: 600; padding: 2px 9px; border-radius: 4px; background: var(--slate-100); color: var(--slate-600); margin-right: 4px; }
+  .tag.critical { background: #fee2e2; color: #991b1b; }
+  .tag.high { background: #ffedd5; color: #9a3412; }
+  .tag.medium { background: #fef9c3; color: #854d0e; }
+  .tag.low { background: #dcfce7; color: #166534; }
+</style>
+</head>
+<body>
+
+<!-- SCREEN BANNER -->
+<header class="doc-header">
+  AI-Powered Audit Evidence Review — Client Demo Guide &nbsp;|&nbsp; Print this page to save as PDF &nbsp;|&nbsp; File → Print → Save as PDF
+</header>
+
+<div class="print-note">
+  💡 <strong>To export as PDF:</strong> File → Print (or Ctrl+P / ⌘P) → Change destination to "Save as PDF" → Save
+</div>
+
+
+<!-- ═══════════════════════ COVER ═══════════════════════ -->
+<div class="page cover">
+  <div class="cover-logo">Big 4 · Enterprise AI Platform · Confidential</div>
+  <div class="cover-badge">Client Demo Guide &amp; Reference Pack</div>
+  <h1>AI-Powered Audit<br/>Evidence Review</h1>
+  <div class="cover-rule"></div>
+  <div class="cover-subtitle">Enterprise Observability, Traceability &amp; Evaluation Platform</div>
+  <p style="color:#64748b; font-size:11pt; max-width:520px;">A complete reference document for audit leadership, covering the platform's purpose, architecture, tab-by-tab capabilities, and a step-by-step demo walkthrough for presenting to clients.</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><label>Prepared For</label><span>Audit Leadership / Client Demo</span></div>
+    <div class="cover-meta-item"><label>Prepared By</label><span>Internal AI CoE Team</span></div>
+    <div class="cover-meta-item"><label>Classification</label><span>Confidential</span></div>
+    <div class="cover-meta-item"><label>Date</label><span>May 2026</span></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ TABLE OF CONTENTS ═══════════════════════ -->
+<div class="page">
+  <h2>Table of Contents</h2>
+  <div style="margin-top:16px;">
+    <div class="toc-section-label">Section A — Context &amp; Solution</div>
+    <div class="toc-entry"><span class="toc-num">1</span><span class="toc-title">Executive Summary</span></div>
+    <div class="toc-entry"><span class="toc-num">2</span><span class="toc-title">Problem Statement — Why This Exists</span></div>
+    <div class="toc-entry"><span class="toc-num">3</span><span class="toc-title">Solution Architecture — The 4-Agent Pipeline</span></div>
+    <div class="toc-entry"><span class="toc-num">4</span><span class="toc-title">AI Safety &amp; Trust Framework</span></div>
+    <div class="toc-entry"><span class="toc-num">5</span><span class="toc-title">Business Case &amp; ROI</span></div>
+
+    <div class="toc-section-label" style="margin-top:16px;">Section B — Platform Guide</div>
+    <div class="toc-entry"><span class="toc-num">6</span><span class="toc-title">Tab-by-Tab Platform Reference (8 Tabs)</span></div>
+
+    <div class="toc-section-label" style="margin-top:16px;">Section C — Demo Execution</div>
+    <div class="toc-entry"><span class="toc-num">7</span><span class="toc-title">Demo Walkthrough — Step-by-Step Script</span></div>
+    <div class="toc-entry"><span class="toc-num">8</span><span class="toc-title">Common Questions &amp; Answers</span></div>
+    <div class="toc-entry"><span class="toc-num">9</span><span class="toc-title">Demo Readiness Checklist</span></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ 1. EXECUTIVE SUMMARY ═══════════════════════ -->
+<div class="page page-break">
+  <h2>1 · Executive Summary</h2>
+
+  <div class="callout navy">
+    <h3 style="color:white; margin-bottom:10px; font-size:13pt;">What This Platform Does</h3>
+    <p>This platform replaces manual, sample-based audit evidence review with a fully autonomous, 4-agent AI pipeline. It processes every document — invoices, contracts, bank reconciliations — end-to-end in under 30 seconds. Every AI decision is logged, traced, and explainable. The result: 100% document coverage, $187 savings per document, and a complete audit trail that satisfies regulators.</p>
+  </div>
+
+  <div class="grid3" style="margin-top:20px;">
+    <div class="stat-card accent"><div class="label">Coverage</div><div class="value">100%</div><div class="sub">vs 8% manual sampling</div></div>
+    <div class="stat-card green"><div class="label">Cost reduction</div><div class="value">&gt;99%</div><div class="sub">$187.50 → $0.04 per doc</div></div>
+    <div class="stat-card accent"><div class="label">Time per document</div><div class="value">18s</div><div class="sub">vs 45 min manual</div></div>
+  </div>
+
+  <div class="grid3">
+    <div class="stat-card"><div class="label">Annualised saving</div><div class="value">$11M+</div><div class="sub">@ 5,000 docs/month</div></div>
+    <div class="stat-card red"><div class="label">Payback period</div><div class="value">&lt;1mo</div><div class="sub">on $50K investment</div></div>
+    <div class="stat-card green"><div class="label">Traceability</div><div class="value">Full</div><div class="sub">Every finding → span → evidence</div></div>
+  </div>
+
+  <p style="margin-top:16px;">The platform is not a black box. It is instrumented at every layer — every LLM call is a named span, every token is counted, every finding carries the chain of evidence that produced it. Leadership has complete visibility from document ingestion to approved finding, in real time.</p>
+</div>
+
+
+<!-- ═══════════════════════ 2. PROBLEM STATEMENT ═══════════════════════ -->
+<div class="page page-break">
+  <h2>2 · Problem Statement — Why This Exists</h2>
+
+  <section>
+    <h3>The Audit Evidence Review Challenge</h3>
+    <p>In a modern Big 4 audit engagement, the volume of supporting documents — invoices, contracts, bank statements, authorization letters — far exceeds the capacity of human reviewers to examine individually. Teams rely on statistical sampling: reviewing only a fraction of documents and inferring compliance from that sample.</p>
+  </section>
+
+  <div class="grid2">
+    <div class="callout red">
+      <h4>Current State — The Gaps</h4>
+      <ul>
+        <li><strong>Only 8% of documents are reviewed.</strong> 92% are never examined — including the documents that contain the most significant findings.</li>
+        <li><strong>$187.50 per document.</strong> At $250/hr and 45 minutes per document, costs scale linearly with volume.</li>
+        <li><strong>Reviewer variance of ±18%.</strong> Different reviewers classify the same document differently. Findings are inconsistent.</li>
+        <li><strong>No traceability.</strong> There is no documented chain between a finding and the specific text in the source document that supports it.</li>
+        <li><strong>Duplicate payments slip through.</strong> Sampling cannot reliably detect cross-document patterns like duplicate invoices from different vendors.</li>
+        <li><strong>Manual process does not scale.</strong> More documents require proportional headcount. There is no efficiency gain.</li>
+      </ul>
+    </div>
+    <div class="callout amber">
+      <h4>Consequences for the Firm</h4>
+      <ul>
+        <li><strong>Regulatory exposure.</strong> Undetected control violations create liability. Auditors sign opinions on incomplete evidence.</li>
+        <li><strong>Financial leakage.</strong> Average duplicate payment incident: $124K. Sampling cannot catch what it does not see.</li>
+        <li><strong>Indefensible opinions.</strong> Without a complete audit trail, findings cannot be substantiated in regulatory review or litigation.</li>
+        <li><strong>Competitive disadvantage.</strong> Firms adopting AI-first audit processes will offer more thorough coverage at lower cost, capturing clients.</li>
+        <li><strong>Talent misallocation.</strong> Senior auditors spend time on mechanical extraction that adds no judgment value.</li>
+      </ul>
+    </div>
+  </div>
+
+  <section class="no-break" style="margin-top:8px;">
+    <h3>The Fundamental Tension</h3>
+    <p>Thoroughness and cost are in direct conflict under the current model. The only way to review more documents is to spend more hours. This platform eliminates that trade-off.</p>
+    <table>
+      <thead><tr><th>Dimension</th><th>Manual Sampling</th><th>AI-Powered Review</th><th>Delta</th></tr></thead>
+      <tbody>
+        <tr><td>Document coverage</td><td>8%</td><td>100%</td><td><span class="badge green">+12.5×</span></td></tr>
+        <tr><td>Time per document</td><td>45 minutes</td><td>18 seconds</td><td><span class="badge green">−99.3%</span></td></tr>
+        <tr><td>Cost per document</td><td>$187.50</td><td>$0.04</td><td><span class="badge green">−99.98%</span></td></tr>
+        <tr><td>Reviewer consistency</td><td>±18% variance</td><td>Deterministic</td><td><span class="badge green">Eliminated</span></td></tr>
+        <tr><td>Audit traceability</td><td>Partial / manual</td><td>Full / automatic</td><td><span class="badge green">New capability</span></td></tr>
+        <tr><td>Scalability</td><td>Linear headcount</td><td>Flat cost</td><td><span class="badge green">Unlimited scale</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+
+<!-- ═══════════════════════ 3. SOLUTION ARCHITECTURE ═══════════════════════ -->
+<div class="page page-break">
+  <h2>3 · Solution Architecture — The 4-Agent Pipeline</h2>
+
+  <p>The platform uses a <strong>sequential multi-agent architecture</strong>. Each agent is a discrete, auditable LLM call with its own system prompt, model assignment, and trace span. Precision-critical control checks use deterministic rules; LLMs handle language-intensive tasks (extraction, classification, reflection).</p>
+
+  <div style="background:var(--slate-50); border:1px solid var(--slate-200); border-radius:10px; padding:18px; margin:16px 0; text-align:center;">
+    <div style="display:flex; align-items:center; justify-content:center; gap:0; flex-wrap:wrap;">
+      <div style="text-align:center; padding:0 6px;">
+        <div style="background:#e0eaff; border:2px solid #2563EB; border-radius:8px; padding:10px 14px; display:inline-block; min-width:90px;">
+          <div style="font-size:16pt;">📄</div>
+          <div style="font-size:9pt; font-weight:700; color:#1e3a8a; margin-top:4px;">Document</div>
+          <div style="font-size:8pt; color:#64748b;">PDF / DOCX / XLSX</div>
+        </div>
+      </div>
+      <div style="font-size:20pt; color:#94a3b8; padding:0 4px;">→</div>
+      <div style="text-align:center; padding:0 6px;">
+        <div style="background:#dbeafe; border:2px solid #2563EB; border-radius:8px; padding:10px 14px; display:inline-block; min-width:90px;">
+          <div style="font-size:12pt; font-weight:800; color:#2563EB;">① Extractor</div>
+          <div style="font-size:8pt; font-family:monospace; color:#64748b; margin-top:3px;">gpt-4o</div>
+          <div style="font-size:8pt; color:#64748b; margin-top:4px;">Parse &amp; structure</div>
+        </div>
+      </div>
+      <div style="font-size:20pt; color:#94a3b8; padding:0 4px;">→</div>
+      <div style="text-align:center; padding:0 6px;">
+        <div style="background:#ede9fe; border:2px solid #7C3AED; border-radius:8px; padding:10px 14px; display:inline-block; min-width:90px;">
+          <div style="font-size:12pt; font-weight:800; color:#7C3AED;">② Validator</div>
+          <div style="font-size:8pt; font-family:monospace; color:#64748b; margin-top:3px;">gpt-4o</div>
+          <div style="font-size:8pt; color:#64748b; margin-top:4px;">R1–R5 controls</div>
+        </div>
+      </div>
+      <div style="font-size:20pt; color:#94a3b8; padding:0 4px;">→</div>
+      <div style="text-align:center; padding:0 6px;">
+        <div style="background:#cffafe; border:2px solid #0891B2; border-radius:8px; padding:10px 14px; display:inline-block; min-width:90px;">
+          <div style="font-size:12pt; font-weight:800; color:#0891B2;">③ Classifier</div>
+          <div style="font-size:8pt; font-family:monospace; color:#64748b; margin-top:3px;">gpt-4o</div>
+          <div style="font-size:8pt; color:#64748b; margin-top:4px;">Risk &amp; finding</div>
+        </div>
+      </div>
+      <div style="font-size:20pt; color:#94a3b8; padding:0 4px;">→</div>
+      <div style="text-align:center; padding:0 6px;">
+        <div style="background:#d1fae5; border:2px solid #059669; border-radius:8px; padding:10px 14px; display:inline-block; min-width:90px;">
+          <div style="font-size:12pt; font-weight:800; color:#059669;">④ Critic</div>
+          <div style="font-size:8pt; font-family:monospace; color:#64748b; margin-top:3px;">gpt-4o</div>
+          <div style="font-size:8pt; color:#64748b; margin-top:4px;">Review &amp; reflect</div>
+        </div>
+      </div>
+      <div style="font-size:20pt; color:#94a3b8; padding:0 4px;">→</div>
+      <div style="text-align:center; padding:0 6px;">
+        <div style="background:#f0fdf4; border:2px solid #059669; border-radius:8px; padding:10px 14px; display:inline-block; min-width:90px;">
+          <div style="font-size:16pt;">✦</div>
+          <div style="font-size:9pt; font-weight:700; color:#14532d; margin-top:4px;">Finding</div>
+          <div style="font-size:8pt; color:#64748b;">Approved output</div>
+        </div>
+      </div>
+    </div>
+    <p class="caption" style="margin-top:12px;">Each arrow is a handoff. Each box is an observable, traceable LLM call with full token accounting.</p>
+  </div>
+
+  <div class="grid2" style="margin-top:4px;">
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-num" style="background:#2563EB;">1</div>
+        <div>
+          <h3 style="margin:0;">Extractor</h3>
+          <span class="model">gpt-4o · Span: sp-extract-*</span>
+        </div>
+      </div>
+      <p><strong>Task:</strong> Parse the raw document (PDF/DOCX/XLSX) and extract structured entities into validated JSON — vendor, amount, date, contract reference, approval status, authorisation chain.</p>
+      <p><strong>Why gpt-4o:</strong> Document parsing requires strong reading comprehension across diverse formats. Accuracy here is foundational — downstream agents trust this output.</p>
+      <p><strong>Observable:</strong> Full system prompt, user message (doc text), output JSON, and token split all visible in Trace Explorer.</p>
+    </div>
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-num" style="background:#7C3AED;">2</div>
+        <div>
+          <h3 style="margin:0;">Validator</h3>
+          <span class="model">gpt-4o · Span: sp-validate-*</span>
+        </div>
+      </div>
+      <p><strong>Task:</strong> Apply 5 deterministic control rules (R1–R5) against the extracted data. For every violation, the Validator must cite an <code style="font-size:8.5pt; background:#f1f5f9; padding:1px 4px; border-radius:3px;">evidence_quote</code> — the exact text from the source document that supports the finding.</p>
+      <p><strong>Control rules:</strong> R1: Dual approval · R2: Amount threshold · R3: Vendor verification · R4: Contract currency &amp; expiry · R5: Duplicate detection.</p>
+      <p><strong>Why this matters:</strong> The evidence_quote is the foundation of groundedness. If the AI cannot cite text, the finding is rejected.</p>
+    </div>
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-num" style="background:#0891B2;">3</div>
+        <div>
+          <h3 style="margin:0;">Classifier</h3>
+          <span class="model">gpt-4o · Span: sp-classify-*</span>
+        </div>
+      </div>
+      <p><strong>Task:</strong> For each validated violation, classify risk as Critical / High / Medium / Low. Draft the formal audit finding, business impact, and recommended management action.</p>
+      <p><strong>Output structure:</strong> Every finding includes <code style="font-size:8.5pt; background:#f1f5f9; padding:1px 4px; border-radius:3px;">risk</code>, <code style="font-size:8.5pt; background:#f1f5f9; padding:1px 4px; border-radius:3px;">finding</code>, <code style="font-size:8.5pt; background:#f1f5f9; padding:1px 4px; border-radius:3px;">impact</code>, <code style="font-size:8.5pt; background:#f1f5f9; padding:1px 4px; border-radius:3px;">recommendation</code>, and a <code style="font-size:8.5pt; background:#f1f5f9; padding:1px 4px; border-radius:3px;">confidence</code> score.</p>
+      <p><strong>Confidence gate:</strong> Findings below 70% confidence are automatically flagged for human-in-the-loop review before they reach the output.</p>
+    </div>
+    <div class="agent-card">
+      <div class="agent-header">
+        <div class="agent-num" style="background:#059669;">4</div>
+        <div>
+          <h3 style="margin:0;">Critic (Reflection Agent)</h3>
+          <span class="model">gpt-4o · Span: sp-critic-*</span>
+        </div>
+      </div>
+      <p><strong>Task:</strong> Independently review every finding produced by the Classifier. The Critic does not see the Classifier's reasoning — it reads the original evidence and forms its own assessment. If it disagrees, it overrides the risk classification and documents why.</p>
+      <p><strong>Pattern:</strong> This is the <strong>Reflection agentic pattern</strong> — the AI checks itself. It is the primary defence against hallucination and misclassification.</p>
+      <p><strong>Override rate:</strong> ~14% of Classifier outputs are revised by Critic. This is healthy — it means the system is catching errors before they reach the auditor.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ 4. AI SAFETY ═══════════════════════ -->
+<div class="page page-break">
+  <h2>4 · AI Safety &amp; Trust Framework</h2>
+
+  <p>Audit is a high-stakes, regulated domain. This platform is designed to be trusted, not just used. Every safeguard is observable and demonstrable in the dashboard.</p>
+
+  <section>
+    <h3>The 5 Safety Mechanisms</h3>
+    <div class="grid2">
+      <div class="callout blue">
+        <h4>① Groundedness Check</h4>
+        <p>Every finding from the Validator must include an <code>evidence_quote</code> — exact text from the source document that supports the finding. If no quote exists, the finding is not produced. This makes hallucination structurally impossible at the Validation stage.</p>
+        <p><strong>Metric:</strong> 100% groundedness across all findings in the current dataset.</p>
+      </div>
+      <div class="callout blue">
+        <h4>② Reflection / Critic Agent</h4>
+        <p>Agent 4 independently reviews all Classifier outputs. It has no memory of Agent 3's reasoning — it approaches the evidence fresh. This mirrors the principle of independent reviewer sign-off in traditional audit.</p>
+        <p><strong>Metric:</strong> ~14% Critic override rate. Every override is logged and visible.</p>
+      </div>
+      <div class="callout blue">
+        <h4>③ Confidence-Gated Escalation</h4>
+        <p>Every finding carries a confidence score. Findings below the 70% threshold are automatically placed in the Human-in-the-Loop queue and cannot proceed to the final output without human approval.</p>
+        <p><strong>Tab:</strong> Governance → Human-in-the-Loop Queue</p>
+      </div>
+      <div class="callout blue">
+        <h4>④ Immutable Audit Log</h4>
+        <p>Every action — document upload, agent call, finding generated, human approval/rejection — is written to an append-only audit log with a timestamp and user attribution. This log cannot be edited and is available for regulatory inspection at any time.</p>
+        <p><strong>Tab:</strong> Governance → Audit Log</p>
+      </div>
+    </div>
+    <div class="callout green" style="margin-top:4px;">
+      <h4>⑤ Full Span Traceability</h4>
+      <p>Every approved finding carries the IDs of all spans that produced it — Extractor span → Validator span → Classifier span → Critic span. Regulators can request a complete trace for any finding and receive the full chain: the document, the prompts, the model outputs, and the confidence scores at each step. This is the "explainability" story for regulatory conversations.</p>
+    </div>
+  </section>
+
+  <section style="margin-top:16px;">
+    <h3>What Cannot Happen</h3>
+    <table>
+      <thead><tr><th>Risk</th><th>Prevention Mechanism</th><th>Where to See It</th></tr></thead>
+      <tbody>
+        <tr><td>AI invents a finding with no evidence</td><td>Validator requires evidence_quote · rejected if none</td><td>Trace Explorer → Validator span</td></tr>
+        <tr><td>Misclassification reaches auditor</td><td>Critic independent review · ~14% override rate</td><td>Observability → Critic Intervention Log</td></tr>
+        <tr><td>Low-confidence finding presented as fact</td><td>Confidence &lt; 70% → human queue, cannot proceed</td><td>Governance → Human-in-the-Loop</td></tr>
+        <tr><td>Actions cannot be audited</td><td>Immutable append-only log, user-attributed</td><td>Governance → Audit Log</td></tr>
+        <tr><td>Model changes break quality</td><td>Eval Suite runs 7-dimension comparison: gpt-4o vs mini</td><td>Observability → Eval Suite</td></tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+
+<!-- ═══════════════════════ 5. BUSINESS CASE ═══════════════════════ -->
+<div class="page page-break">
+  <h2>5 · Business Case &amp; ROI</h2>
+
+  <div class="callout navy">
+    <h3 style="color:white; margin-bottom:12px;">The Numbers</h3>
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px;">
+      <div><div style="font-size:8pt; color:#93c5fd; text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px;">Manual cost/doc</div><div style="font-size:22pt; font-weight:800; font-family:monospace; color:white;">$187.50</div><div style="font-size:8.5pt; color:#93c5fd;">45 min @ $250/hr</div></div>
+      <div><div style="font-size:8pt; color:#93c5fd; text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px;">AI cost/doc</div><div style="font-size:22pt; font-weight:800; font-family:monospace; color:#6ee7b7;">$0.04</div><div style="font-size:8.5pt; color:#93c5fd;">~18 seconds</div></div>
+      <div><div style="font-size:8pt; color:#93c5fd; text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px;">Monthly saving</div><div style="font-size:22pt; font-weight:800; font-family:monospace; color:#6ee7b7;">$937K</div><div style="font-size:8.5pt; color:#93c5fd;">@ 5,000 docs/mo</div></div>
+      <div><div style="font-size:8pt; color:#93c5fd; text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px;">Annual saving</div><div style="font-size:22pt; font-weight:800; font-family:monospace; color:#6ee7b7;">$11.2M</div><div style="font-size:8.5pt; color:#93c5fd;">vs status quo</div></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:14px;">
+    <section>
+      <h3>Direct Cost Savings</h3>
+      <table>
+        <thead><tr><th>Volume</th><th>Manual cost</th><th>AI cost</th><th>Saving</th></tr></thead>
+        <tbody>
+          <tr><td>100 docs</td><td>$18,750</td><td>$4</td><td class="badge green">$18,746</td></tr>
+          <tr><td>1,000 docs</td><td>$187,500</td><td>$40</td><td class="badge green">$187,460</td></tr>
+          <tr><td>5,000 docs/mo</td><td>$937,500/mo</td><td>$200/mo</td><td class="badge green">$937,300/mo</td></tr>
+          <tr><td>5,000 docs/mo</td><td>$11.25M/yr</td><td>$2,400/yr</td><td class="badge green">$11.25M/yr</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h3>Value Beyond Cost</h3>
+      <ul>
+        <li><strong>100% coverage:</strong> Every document reviewed. No findings missed by sampling.</li>
+        <li><strong>Duplicate detection:</strong> AI sees all documents simultaneously — can catch cross-document duplicates impossible to detect by sampling.</li>
+        <li><strong>Consistency:</strong> Zero reviewer variance. Same document → same finding, every time.</li>
+        <li><strong>Speed:</strong> Audit cycle shortened from days to hours. Faster reporting to audit committees.</li>
+        <li><strong>Regulatory readiness:</strong> Full trace available on demand. No scrambling for evidence.</li>
+        <li><strong>Senior auditor redeployment:</strong> Free experienced staff from mechanical extraction to judgment-intensive work.</li>
+      </ul>
+    </section>
+  </div>
+
+  <section style="margin-top:8px;" class="no-break">
+    <h3>Investment &amp; Payback</h3>
+    <div class="grid3">
+      <div class="stat-card"><div class="label">Platform investment</div><div class="value">$50K</div><div class="sub">One-time setup + first year</div></div>
+      <div class="stat-card green"><div class="label">Payback period</div><div class="value">&lt;1 mo</div><div class="sub">At 5,000 docs/month</div></div>
+      <div class="stat-card accent"><div class="label">3-year NPV</div><div class="value">$33M+</div><div class="sub">At 5% discount rate</div></div>
+    </div>
+    <div class="callout amber" style="margin-top:12px;">
+      <h4>The Risk of Inaction</h4>
+      <p>Every month without this platform costs approximately $937K in unnecessary manual review costs (at 5,000 docs). Beyond cost, a single missed Critical finding — the kind that sampling routinely misses — can result in audit firm liability, reputational damage, and regulatory sanction that dwarfs the investment in this platform.</p>
+    </div>
+  </section>
+</div>
+
+
+<!-- ═══════════════════════ 6. TAB REFERENCE ═══════════════════════ -->
+<div class="page page-break">
+  <h2>6 · Tab-by-Tab Platform Reference</h2>
+  <p style="color:var(--slate-500); margin-bottom:20px;">The platform has 8 navigable tabs. Each section below explains what it contains, what the audience should take away, and how it benefits leadership.</p>
+
+  <!-- Tab 1 -->
+  <div class="tab-card">
+    <div class="tab-header">
+      <div class="tab-num">①</div>
+      <div>
+        <h3>Executive Overview</h3>
+        <div class="path">Navigation path: "/" · First tab in sidebar</div>
+      </div>
+    </div>
+    <p><strong>What it shows:</strong> The command centre for audit leadership. 6 live KPI cards update in real time as new documents are processed — total documents analyzed, total findings, Critical findings count, compliance rate, total tokens consumed, and total AI spend.</p>
+    <p><strong>Key elements:</strong></p>
+    <ul>
+      <li><strong>Risk Distribution pie chart:</strong> Breakdown of all findings by severity level (Critical, High, Medium, Low). Drills down the risk profile across the entire document set.</li>
+      <li><strong>Cost-per-document trend:</strong> Line chart showing AI spend per document over time. Demonstrates operational efficiency and flags anomalies.</li>
+      <li><strong>ROI Snapshot panel:</strong> Live calculation — auditor cost at $250/hr vs actual AI spend, net savings, annualised projection, coverage comparison (100% AI vs 8% manual).</li>
+    </ul>
+    <div>
+      <span class="benefit-pill">✓ Financial impact visible at a glance</span>
+      <span class="benefit-pill">✓ Risk posture across all documents</span>
+      <span class="benefit-pill">✓ Real-time — updates with every upload</span>
+    </div>
+    <div class="callout blue" style="margin-top:10px; padding:10px 14px;">
+      <strong>Leadership talking point:</strong> "This is what the board or audit committee would see. Every document ever processed is summarised here with its cost, its findings, and the net saving versus the manual alternative. It updates live."
+    </div>
+  </div>
+
+  <!-- Tab 2 -->
+  <div class="tab-card">
+    <div class="tab-header">
+      <div class="tab-num">②</div>
+      <div>
+        <h3>Upload &amp; Analyze</h3>
+        <div class="path">Navigation path: "/upload" · Second tab</div>
+      </div>
+    </div>
+    <p><strong>What it shows:</strong> The live document processing experience. Documents can be dropped onto the upload zone, browsed from disk, or triggered from the pre-seeded demo list. The right panel shows a <strong>live streaming trace</strong> — each agent activates in sequence with its model, token count, cost, and latency updating in real time.</p>
+    <p><strong>Key elements:</strong></p>
+    <ul>
+      <li><strong>Live trace panel:</strong> Extractor → Validator → Classifier → Critic shown as live steps. Each step shows model name, tokens used, cost to 5 decimal places, and latency. Demonstrates the agentic pipeline in action.</li>
+      <li><strong>Global state sync:</strong> When analysis completes, all 8 tabs update instantly. Navigate to Trace Explorer or Cost &amp; Performance — the new document appears everywhere.</li>
+      <li><strong>Run Demo Sequence button:</strong> Automatically processes 3 documents in sequence for a hands-free demonstration.</li>
+    </ul>
+    <div>
+      <span class="benefit-pill">✓ Shows AI pipeline live, not as a concept</span>
+      <span class="benefit-pill">✓ Full transparency into what the AI is doing</span>
+      <span class="benefit-pill">✓ All tabs sync — demonstrates system coherence</span>
+    </div>
+    <div class="callout blue" style="margin-top:10px; padding:10px 14px;">
+      <strong>Leadership talking point:</strong> "Watch this — we drop the document, and you can see each AI agent activate in sequence. There's no black box here. Every token, every cost, every decision is visible as it happens."
+    </div>
+  </div>
+
+  <!-- Tab 3 -->
+  <div class="tab-card">
+    <div class="tab-header">
+      <div class="tab-num">③</div>
+      <div>
+        <h3>Trace Explorer</h3>
+        <div class="path">Navigation path: "/traces" · Third tab</div>
+      </div>
+    </div>
+    <p><strong>What it shows:</strong> The deepest observability layer. Select any document from the left panel and see its complete trace — waterfall timeline, cost attribution by agent, and an expandable span tree with every LLM call fully documented.</p>
+    <p><strong>Key elements:</strong></p>
+    <ul>
+      <li><strong>Waterfall chart:</strong> Shows the timing and overlap of each agent call across the full document processing time.</li>
+      <li><strong>Cost attribution pie:</strong> Which agent consumed what percentage of the total AI spend for this document.</li>
+      <li><strong>Span tree:</strong> Each span (LLM call) is expandable. Clicking opens the full token breakdown (system/user/output), cost, latency, input summary, output, and reasoning.</li>
+      <li><strong>Context window viewer:</strong> "What did the agent see?" — shows the exact system prompt and user message sent to the model. Critical for audit traceability and regulatory review.</li>
+      <li><strong>Re-run with gpt-4o-mini:</strong> Per-span replay using a cheaper model. Shows real-time cost vs quality comparison. Key cost-optimisation story.</li>
+    </ul>
+    <div>
+      <span class="benefit-pill">✓ Complete AI transparency</span>
+      <span class="benefit-pill">✓ Regulatory-grade traceability</span>
+      <span class="benefit-pill">✓ Cost optimisation evidence</span>
+    </div>
+    <div class="callout blue" style="margin-top:10px; padding:10px 14px;">
+      <strong>Leadership talking point:</strong> "If a regulator asks why the AI classified this finding as Critical, we can show them exactly this — the document text it read, the rules it checked, the output it produced, and the Critic agent's independent review. Everything is here."
+    </div>
+  </div>
+</div>
+
+<div class="page page-break">
+  <!-- Tab 4 -->
+  <div class="tab-card">
+    <div class="tab-header">
+      <div class="tab-num">④</div>
+      <div>
+        <h3>Cost &amp; Performance Analytics</h3>
+        <div class="path">Navigation path: "/analytics" · Fourth tab</div>
+      </div>
+    </div>
+    <p><strong>What it shows:</strong> Aggregated operational metrics across all processed documents. The financial performance of the AI pipeline at scale — cost trends, latency distributions, model mix, and per-finding economics.</p>
+    <p><strong>Key elements:</strong></p>
+    <ul>
+      <li><strong>Spend trend chart:</strong> Cost per document over time. Supports USD or INR toggle.</li>
+      <li><strong>Token consumption by agent:</strong> Which agent consumes the most tokens — and therefore where cost-optimisation efforts should focus.</li>
+      <li><strong>Latency percentiles (p50/p95/p99):</strong> Performance SLA evidence per agent. Shows how consistent the pipeline is under load.</li>
+      <li><strong>Model mix:</strong> Breakdown between gpt-4o and gpt-4o-mini calls. Visualises the routing strategy.</li>
+      <li><strong>Cost per finding by risk tier:</strong> Critical findings cost more to produce (more Critic intervention) — this chart justifies the investment in thoroughness for high-stakes findings.</li>
+    </ul>
+    <div>
+      <span class="benefit-pill">✓ Operational cost accountability</span>
+      <span class="benefit-pill">✓ Performance SLA evidence</span>
+      <span class="benefit-pill">✓ CFO-friendly financial breakdown</span>
+    </div>
+  </div>
+
+  <!-- Tab 5 -->
+  <div class="tab-card">
+    <div class="tab-header">
+      <div class="tab-num">⑤</div>
+      <div>
+        <h3>Governance</h3>
+        <div class="path">Navigation path: "/governance" · Fifth tab</div>
+      </div>
+    </div>
+    <p><strong>What it shows:</strong> The compliance and controls layer. Three sub-tabs covering human oversight, failure modes, and the immutable audit trail.</p>
+    <p><strong>Key elements:</strong></p>
+    <ul>
+      <li><strong>Human-in-the-Loop Queue:</strong> All findings flagged by the Critic agent or below the 70% confidence threshold appear here for human review before they reach the output. Approve or reject with a click. This demonstrates that humans remain in control.</li>
+      <li><strong>Failure Mode Anatomy:</strong> Tracks every document parse failure, Critic override, JSON parsing error, and rate limit. The system is transparent about its own failures.</li>
+      <li><strong>Audit Log:</strong> Every action — upload, analysis, export, human review decision — in an immutable, append-only, timestamped, user-attributed log. Regulator-ready out of the box.</li>
+    </ul>
+    <div>
+      <span class="benefit-pill">✓ Human oversight — AI doesn't act alone</span>
+      <span class="benefit-pill">✓ Regulatory audit trail</span>
+      <span class="benefit-pill">✓ Transparent about failures</span>
+    </div>
+    <div class="callout blue" style="margin-top:10px; padding:10px 14px;">
+      <strong>Leadership talking point:</strong> "This is the governance story. The AI flags anything uncertain for human review — it doesn't publish findings unilaterally. And every action taken in the system is logged here, permanently, with who did it and when."
+    </div>
+  </div>
+
+  <!-- Tab 6 -->
+  <div class="tab-card">
+    <div class="tab-header">
+      <div class="tab-num">⑥</div>
+      <div>
+        <h3>Observability &amp; Eval</h3>
+        <div class="path">Navigation path: "/observability" · Sixth tab</div>
+      </div>
+    </div>
+    <p><strong>What it shows:</strong> The AI quality measurement layer — the dashboard's most technically sophisticated section. Four sub-tabs covering the AI system's health, quality metrics, and model comparison.</p>
+    <p><strong>Key elements:</strong></p>
+    <ul>
+      <li><strong>Overview tab:</strong> 3-pillar summary (Observability / Traceability / Evaluation), 6 live KPI cards (spans, override rate, hallucinations caught, avg confidence, groundedness, escalations), Critic Intervention Log.</li>
+      <li><strong>Observability tab:</strong> Token efficiency ratio by agent, Agent Performance Scorecard (radar chart across 5 dimensions), per-span metrics table with context window utilisation %.</li>
+      <li><strong>Traceability tab:</strong> Finding → Span Chain table linking every finding to its full pipeline trace. End-to-end architecture diagram.</li>
+      <li><strong>Evaluation Metrics tab:</strong> 10-row scorecard — Groundedness, Faithfulness, Answer Relevance, Context Precision, Confidence, Override Rate, Hallucination Rate, Escalation Rate, Parse Failure Rate, E2E Traceability — all with Pass/Fail vs benchmark.</li>
+      <li><strong>Eval Suite tab:</strong> "Run Evaluation Suite" — select a document, click Run. System evaluates gpt-4o and gpt-4o-mini in sequence and produces a side-by-side comparison: radar chart, cost/latency bars, 7-dimension scorecard with deltas. Recommendation: "Use gpt-4o-mini ✓" or "Stick with gpt-4o".</li>
+    </ul>
+    <div>
+      <span class="benefit-pill">✓ AI quality is measurable, not assumed</span>
+      <span class="benefit-pill">✓ Model routing decisions are data-driven</span>
+      <span class="benefit-pill">✓ Hallucination detection is quantified</span>
+    </div>
+  </div>
+
+  <!-- Tab 7 -->
+  <div class="tab-card">
+    <div class="tab-header">
+      <div class="tab-num">⑦</div>
+      <div>
+        <h3>Business Case</h3>
+        <div class="path">Navigation path: "/business-case" · Seventh tab</div>
+      </div>
+    </div>
+    <p><strong>What it shows:</strong> The CFO and CEO-facing narrative. Annualised ROI, payback period, NPV calculation, comparison table versus manual process, and the strategic narrative for C-suite approval.</p>
+    <div>
+      <span class="benefit-pill">✓ Decision-maker ready financial narrative</span>
+      <span class="benefit-pill">✓ Investment justification at enterprise scale</span>
+    </div>
+  </div>
+
+  <!-- Tab 8 -->
+  <div class="tab-card">
+    <div class="tab-header">
+      <div class="tab-num">⑧</div>
+      <div>
+        <h3>Executive Report</h3>
+        <div class="path">Navigation path: "/report" · Eighth tab</div>
+      </div>
+    </div>
+    <p><strong>What it shows:</strong> A print-ready A4 executive summary report generated dynamically from live data. Covers problem statement, solution architecture, all 6 platform capabilities, and the full business impact table with live figures.</p>
+    <p><strong>Key element:</strong> The "Export as PDF" button generates the report based on whatever documents have been processed in the current session — including any documents uploaded during the demo. Powerful closing move: upload a document live, then export the report with it included.</p>
+    <div>
+      <span class="benefit-pill">✓ Leave-behind for leadership</span>
+      <span class="benefit-pill">✓ Live data — not a static template</span>
+      <span class="benefit-pill">✓ Print-ready in one click</span>
+    </div>
+    <div class="callout green" style="margin-top:10px; padding:10px 14px;">
+      <strong>Closing move:</strong> "Before we finish, let me generate a live executive report from everything we just processed together today." Click Export as PDF in front of the client.
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ 7. DEMO WALKTHROUGH ═══════════════════════ -->
+<div class="page page-break">
+  <h2>7 · Demo Walkthrough — Step-by-Step Script</h2>
+
+  <div class="callout amber" style="margin-bottom:20px;">
+    <h4>Before you begin</h4>
+    <ul>
+      <li>Open the dashboard in a browser. The preview pane should show the <strong>Executive Overview</strong> tab.</li>
+      <li>Recommended screen resolution: 1280×800 or larger. Chrome or Edge preferred.</li>
+      <li>Estimated demo duration: <strong>20–25 minutes</strong> for a full walkthrough. <strong>10–12 minutes</strong> for an executive highlight.</li>
+      <li>No login or setup required — data is pre-seeded. The "Run Demo Sequence" button on the Upload tab triggers everything automatically.</li>
+    </ul>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="step-card">
+    <div class="step-num">1</div>
+    <h3>Opening — Set the Context (2 min)</h3>
+    <div class="time-badge">⏱ 2 minutes · Tab: Executive Overview</div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "What you're looking at is a real-time audit intelligence platform. This isn't a slide deck — everything you see is live data from documents that have actually been processed through our AI pipeline. Let me walk you through what it does and why it changes the economics of audit."
+    </div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      Point to the 6 KPI cards at the top. Highlight the "Total Spend" and contrast it with the "Auditor Cost (Manual)" in the ROI Snapshot at the bottom of the page. Let the numbers speak first.
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "These 8 documents here were processed by our AI pipeline. Each one took roughly 18 seconds and cost about 4 cents. The same work manually — at $250 an hour — would have taken 6 hours and cost over $1,500. That's the headline."
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step-card">
+    <div class="step-num">2</div>
+    <h3>The Problem — Why We Built This (2 min)</h3>
+    <div class="time-badge">⏱ 2 minutes · No navigation needed — talk from Overview</div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "In a typical audit engagement, your team reviews about 8% of supporting documents by sampling. The other 92% go unreviewed. That's not a criticism — it's a structural constraint. There aren't enough hours. But it means that the invoice that was duplicated, or the contract that expired 6 months before the payment was authorised — those could easily sit in the 92% that nobody looks at."
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "And when a regulator asks why that wasn't caught, the answer 'we sampled 8%' is not a comfortable position to be in. This platform removes that constraint entirely."
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step-card">
+    <div class="step-num">3</div>
+    <h3>Live Document Processing — The Pipeline in Action (4 min)</h3>
+    <div class="time-badge">⏱ 4 minutes · Tab: Upload &amp; Analyze</div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      Click "Upload & Analyze" in the sidebar. Point to the drop zone and the pre-seeded document list on the left. Click on "GlobalPay_Duplicate_Invoice.pdf" (Critical risk) to start the simulation.
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "Watch the right panel. We've just submitted this invoice to the pipeline. Four AI agents are going to run in sequence — you can see each one activate, the model it's using, how many tokens it consumed, what it cost, and how long it took."
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say (as agents complete):</span>
+      "Agent 1 — Extractor — has parsed the document and pulled out the structured data: vendor, amount, invoice number, approval status. Agent 2 — Validator — is now checking it against our 5 control rules. This one checks for duplicate vendor-amount combinations. And — there it is — a Critical finding. Agent 3 — Classifier — has written the formal audit observation with a risk level and a recommendation. And Agent 4 — the Critic — is independently reviewing that finding. It doesn't see what Agent 3 thought. It forms its own view from the evidence."
+    </div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      When the analysis completes, click "View in Trace Explorer →" from the confirmation banner.
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "Notice that banner says 'all tabs updated'. That document we just processed is now visible in Cost &amp; Performance, in Governance, in the Observability metrics — everywhere. One action, instant propagation."
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step-card">
+    <div class="step-num">4</div>
+    <h3>Trace Explorer — Full AI Transparency (4 min)</h3>
+    <div class="time-badge">⏱ 4 minutes · Tab: Trace Explorer</div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "This is where the transparency story comes to life. The document we just processed is here on the left. On the right is every single AI call that produced its findings."
+    </div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      Point to the Waterfall chart. Then scroll to the Span Tree and click to expand the Validator span.
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "Every span is a named LLM call. I can see it consumed 847 input tokens, produced 312 output tokens, cost $0.00612, and took 1.2 seconds. I can expand it and see the full output."
+    </div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      Click "👁 What did the agent see?" on the Validator span.
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "This is the context window. This is the exact text the AI was given. The system prompt — its instructions. The user message — the document data. If a regulator ever asks 'what was the AI shown when it made this finding?' — this is the answer. Verbatim. With a timestamp."
+    </div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      Close the context window. Click "↻ Re-run with gpt-4o-mini" on any span. Click "Run Replay" in the modal.
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "Here's something powerful for your technology teams. We can replay any individual agent call using a cheaper model — gpt-4o-mini costs about 97% less — and compare the output quality side by side. The quality is essentially identical for lower-risk documents. The full Evaluation Suite on the Observability tab quantifies this comparison across 7 dimensions."
+    </div>
+  </div>
+</div>
+
+<div class="page page-break">
+  <!-- Step 5 -->
+  <div class="step-card">
+    <div class="step-num">5</div>
+    <h3>Governance — Humans Stay in Control (3 min)</h3>
+    <div class="time-badge">⏱ 3 minutes · Tab: Governance</div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      Click "Governance" in the sidebar. The Human-in-the-Loop tab should be active by default.
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "One of the first questions we always get is: 'Does the AI publish findings without human sign-off?' The answer is no. Any finding where the Critic agent disagreed with the Classifier, or where the confidence score is below 70%, lands in this queue. A human reviewer approves or rejects before it goes anywhere."
+    </div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      If there are items in the queue, click "Approve" on one to demonstrate. Then click the "Audit Log" tab.
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "This is the audit log. Every action — every upload, every analysis, every human review decision — is recorded here permanently. It's append-only. Nobody can edit or delete entries. User-attributed with timestamps. If your audit committee or a regulator asks for a complete record of everything that happened during this engagement — you print this."
+    </div>
+  </div>
+
+  <!-- Step 6 -->
+  <div class="step-card">
+    <div class="step-num">6</div>
+    <h3>Observability &amp; Eval — Measuring AI Quality (4 min)</h3>
+    <div class="time-badge">⏱ 4 minutes · Tab: Observability &amp; Eval</div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      Click "Observability & Eval" in the sidebar. Start on the Overview tab to show the KPI cards and Critic Intervention Log.
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "The question we hear most often from technology and risk committees is: how do you know the AI is getting it right? This tab is the answer."
+    </div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      Click the "Evaluation Metrics" sub-tab. Point to the table.
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "We measure the AI on 10 dimensions. Groundedness — are findings backed by cited evidence from the source document? 100%. Faithfulness — did the Classifier's findings hold up under the Critic's independent review? Over 85%. Hallucination rate — how many unsupported findings reached the output? Zero. Every dimension shows Pass against its benchmark."
+    </div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      Click the "Eval Suite" sub-tab. Select the first document in the dropdown. Click "Run Evaluation Suite".
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say (while it runs):</span>
+      "Watch this. The system is now running the complete pipeline twice on this document — once with gpt-4o, and once with gpt-4o-mini, the cheaper model. In about 10 seconds, it'll produce a side-by-side comparison of cost and quality."
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say (when complete):</span>
+      "There's the result. 97% cost saving. Quality drop on groundedness? Less than 2%. The system is recommending gpt-4o-mini for this document type. This is how we make model routing decisions — with data, not assumptions."
+    </div>
+  </div>
+
+  <!-- Step 7 -->
+  <div class="step-card">
+    <div class="step-num">7</div>
+    <h3>Business Case — The ROI Conversation (2 min)</h3>
+    <div class="time-badge">⏱ 2 minutes · Tab: Business Case</div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      Click "Business Case" in the sidebar.
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "For your CFO and your technology investment committee — here's the financial model. At 5,000 documents a month, which is conservative for a Big 4 engagement, the saving versus manual review is $937,000 per month. The platform pays back a $50,000 investment in under 30 days."
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "But beyond the direct cost saving — consider what you gain. Every document. Zero reviewer variance. Full traceability. A defensible audit trail. These are things money can't easily buy in the current model."
+    </div>
+  </div>
+
+  <!-- Step 8 -->
+  <div class="step-card">
+    <div class="step-num">8</div>
+    <h3>Closing — Live Report Export (2 min)</h3>
+    <div class="time-badge">⏱ 2 minutes · Tab: Executive Report</div>
+    <div class="do-box">
+      <span class="do-label">Do:</span>
+      Click "Executive Report" in the sidebar. Show the live figures reflecting everything processed during the demo. Click "Export as PDF".
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say:</span>
+      "Before we wrap up — this is the leave-behind. The Executive Report generates dynamically from everything we just processed together today. The document we uploaded 10 minutes ago is already in here. The ROI figures, the findings, the cost breakdown — all live. Not a template someone filled in. You can take this to your audit committee today."
+    </div>
+    <div class="say-box">
+      <span class="say-label">Say (closing):</span>
+      "What we've shown you today is not a proof of concept — it's a production-ready platform. Every capability you've seen is live. Every number is real. The question isn't whether this technology works. The question is how quickly your organisation can be the firm that deploys it first."
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════ 8. Q&A ═══════════════════════ -->
+<div class="page page-break">
+  <h2>8 · Common Questions &amp; Answers</h2>
+  <p style="margin-bottom:16px;">Questions likely to be raised by audit leadership, technology committees, and risk officers — with suggested responses.</p>
+
+  <table>
+    <thead><tr><th style="width:35%;">Question</th><th>Suggested Answer</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>"What happens when the AI gets it wrong?"</strong></td>
+        <td>We expect the AI to get things wrong occasionally — that's why we designed for it. Agent 4 (Critic) independently reviews all findings and overrides about 14% of them. Anything below 70% confidence goes to a human reviewer before it reaches output. And every action is logged. The question isn't "is the AI perfect?" — it's "is this process safer and more complete than manual sampling?" The answer is yes on both counts.</td>
+      </tr>
+      <tr>
+        <td><strong>"Is our client data secure?"</strong></td>
+        <td>Documents are processed in isolated compute environments. There is no training on client data — OpenAI's enterprise API contract explicitly prohibits this. Every access is timestamped and attributed in the audit log. We can configure on-premise or private cloud deployment for engagements with heightened data sensitivity.</td>
+      </tr>
+      <tr>
+        <td><strong>"Can we trust findings from an AI for a signed audit opinion?"</strong></td>
+        <td>The AI doesn't sign the opinion — the partner does. The platform surfaces findings with evidence, confidence scores, and full traceability. The audit team reviews and approves each finding. The AI dramatically increases the number of documents reviewed and the consistency of that review, but every finding is human-approved before it reaches the report.</td>
+      </tr>
+      <tr>
+        <td><strong>"What if the AI model changes or degrades?"</strong></td>
+        <td>The Eval Suite (Observability tab) runs a 7-dimension benchmark comparison on demand. We can detect quality degradation before it affects outputs. The model is also abstracted — we can swap providers by changing a single configuration value, without touching any application code.</td>
+      </tr>
+      <tr>
+        <td><strong>"How does this integrate with our existing audit tools?"</strong></td>
+        <td>The platform outputs structured JSON per finding — compatible with standard audit management platforms. The Export PDF function generates reports that match existing working paper formats. API integration with document management systems (SharePoint, iManage) is a standard integration layer we can build in Phase 2.</td>
+      </tr>
+      <tr>
+        <td><strong>"What about regulatory acceptance of AI-assisted audit?"</strong></td>
+        <td>The platform is designed for the regulatory conversations that are coming. Full traceability means every finding can be supported with a complete chain: document → agent call → evidence quote → finding. PCAOB and FRC guidance increasingly accepts AI-assisted audit where the AI's reasoning is documented and human judgment is applied to outcomes. This platform provides exactly that documentation.</td>
+      </tr>
+      <tr>
+        <td><strong>"What's the implementation timeline?"</strong></td>
+        <td>The core platform is production-ready as shown. A firm-specific deployment — custom control rules, document template calibration, integration with existing DMS — typically takes 4–6 weeks. A pilot engagement on one client portfolio can begin within 2 weeks of commercial agreement.</td>
+      </tr>
+      <tr>
+        <td><strong>"Could we have built this ourselves?"</strong></td>
+        <td>You could — the technology is accessible. The IP here is in the design choices: the agent architecture, the control rule library, the safety framework (groundedness, reflection, escalation), and the observability instrumentation. Building and validating this in-house would typically take 12–18 months and $800K–$1.2M in engineering cost. We're offering it ready to deploy.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════ 9. READINESS CHECKLIST ═══════════════════════ -->
+<div class="page page-break">
+  <h2>9 · Demo Readiness Checklist</h2>
+  <p style="margin-bottom:16px;">Run through this checklist before every client demo session.</p>
+
+  <div class="grid2">
+    <div>
+      <h3>Technical Setup</h3>
+      <ul class="checklist" style="margin-top:10px;">
+        <li>Dashboard is open in Chrome or Edge at the correct URL</li>
+        <li>Preview pane shows Executive Overview (first tab active)</li>
+        <li>All 8 pre-seeded documents are visible in Upload tab's document list</li>
+        <li>Workflows are running (green dot in sidebar footer says "Live")</li>
+        <li>Screen resolution is 1280×800 minimum; zoom is at 100%</li>
+        <li>Second monitor or screen share is configured if presenting remotely</li>
+        <li>Browser is full-screen or presentation mode</li>
+      </ul>
+
+      <h3 style="margin-top:20px;">Content Verification</h3>
+      <ul class="checklist">
+        <li>Executive Overview shows 8 documents and correct KPI figures</li>
+        <li>Risk Distribution chart is visible with at least 3 risk tiers populated</li>
+        <li>ROI Snapshot shows positive net savings figure</li>
+        <li>Trace Explorer shows complete span trees for at least 3 documents</li>
+        <li>Governance Audit Log shows at least 15 entries</li>
+        <li>Observability Eval Metrics table shows all 10 rows as "Pass"</li>
+        <li>Executive Report generates successfully and shows live figures</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Demo Flow Preparation</h3>
+      <ul class="checklist" style="margin-top:10px;">
+        <li>You have rehearsed the 8-step script at least twice</li>
+        <li>You can explain the 4-agent pipeline without reading from notes</li>
+        <li>You know which document to click first (GlobalPay_Duplicate_Invoice.pdf for Critical demo)</li>
+        <li>You have answers ready for the 8 common questions in Section 8</li>
+        <li>You know how to demo the Eval Suite (Observability → Eval Suite tab)</li>
+        <li>You have practised the "Export as PDF" closing move</li>
+      </ul>
+
+      <h3 style="margin-top:20px;">Audience-Specific Emphasis</h3>
+      <table style="margin-top:8px;">
+        <thead><tr><th>Audience</th><th>Lead with</th></tr></thead>
+        <tbody>
+          <tr><td>CFO / Finance</td><td>ROI Snapshot on Overview · Business Case tab · cost-per-finding chart</td></tr>
+          <tr><td>CTO / Technology</td><td>Trace Explorer · Eval Suite · gpt-4o-mini replay · model routing</td></tr>
+          <tr><td>Chief Risk Officer</td><td>Governance → Human-in-loop + Audit Log · Observability safety metrics</td></tr>
+          <tr><td>Audit Partner</td><td>Traceability tab · Finding → Span chain · context window viewer</td></tr>
+          <tr><td>Audit Committee</td><td>Executive Overview KPIs · Business Case · Executive Report export</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout green" style="margin-top:16px;">
+        <h4>The One-Sentence Pitch</h4>
+        <p>If you have 30 seconds with a senior leader: <em>"We built a platform that reviews 100% of your audit documents in seconds, costs 4 cents per document instead of $187, and produces a complete regulatory-grade audit trail — automatically."</em></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout navy" style="margin-top:24px;">
+    <h3 style="color:white; margin-bottom:10px;">Platform Status Summary — Ready for Demo</h3>
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:4px;">
+      <div><div style="font-size:8pt; color:#93c5fd; text-transform:uppercase; margin-bottom:4px;">Tabs working</div><div style="font-size:16pt; font-weight:800; color:#6ee7b7;">8 / 8</div></div>
+      <div><div style="font-size:8pt; color:#93c5fd; text-transform:uppercase; margin-bottom:4px;">Upload sync</div><div style="font-size:16pt; font-weight:800; color:#6ee7b7;">✓ Live</div></div>
+      <div><div style="font-size:8pt; color:#93c5fd; text-transform:uppercase; margin-bottom:4px;">Eval Suite</div><div style="font-size:16pt; font-weight:800; color:#6ee7b7;">✓ Working</div></div>
+      <div><div style="font-size:8pt; color:#93c5fd; text-transform:uppercase; margin-bottom:4px;">PDF export</div><div style="font-size:16pt; font-weight:800; color:#6ee7b7;">✓ Ready</div></div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <span>AI-Powered Audit Evidence Review — Demo Guide · Confidential · Not for distribution</span>
+    <span>Prepared May 2026 · Internal AI CoE</span>
+  </div>
+</div>
+
+</body>
+</html>
